@@ -1,4 +1,5 @@
 import random
+import math 
 
 
 #Individual
@@ -57,6 +58,8 @@ def ordered_crossover(parent1, parent2):
     return Individual(child_genome)
 
 
+
+
 #GA evolve loop
 def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.1):
     for ind in pop.individuals:
@@ -94,22 +97,124 @@ def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.
     return pop.get_best()
 
 
-#temp fitness
-def dummy_fitness(ind):
-    return ind.genome[0]
+
+CONTAINER_W = 20.0
+CONTAINER_H = 15.0
+CONTAINER_MAX_HEIGHT = 9999999.0
+
+
+CYLINDERS = [
+    {"diameter": 2.0, "weight": 100.0},
+    {"diameter": 2.4, "weight": 150.0},
+    {"diameter": 1.6, "weight": 80.0},
+    {"diameter": 3.0, "weight": 200.0}
+]
+
+
+def radius(cid):
+    return CYLINDERS[cid]["diameter"] / 2.0
+
+def weight(cid):
+    return CYLINDERS[cid]["weight"]
 
 
 
 
+
+def decode_ordering(ordering):
+    """
+    Simple row placement
+    """
+
+    placed = []
+
+    x = 0.0
+    y = 0.0
+    row_height = 0.0
+
+    for cid in ordering:
+        r = radius(cid)
+        d = 2.0 * r
+
+        if x + d > CONTAINER_W:
+            x = 0.0
+            y += row_height
+            row_height = 0.0
+
+        if y + d > CONTAINER_H:
+            break 
+
+
+        cx = x + r 
+        cy = y + r 
+        placed.append((cid, cx, cy))
+
+        x += d 
+        row_height = max(row_height, d)
+
+    return placed
+
+
+def cargo_fitness(ind):
+    ordering = ind.genome
+    placed = decode_ordering(ordering)
+
+
+    penalty = 0.0 
+
+    unplaced = len(ordering) - len(placed)
+    penalty += unplaced * 1_000_000
+
+
+    total_w = sum(weight(cid) for (cid, _, _) in placed)
+    if total_w > CONTAINER_MAX_HEIGHT:
+        penalty += (total_w - CONTAINER_MAX_HEIGHT) * 10_000.0
+
+    if total_w > 0:
+        com_x = sum(x * weight(cid) for (cid, x, _) in placed) / total_w
+        safe_min = 0.2 * CONTAINER_W
+        safe_max = 0.8 * CONTAINER_W
+
+        if com_x < safe_min:
+            penalty += (safe_min - com_x) * 100_000.0
+        elif com_x > safe_min:
+            penalty += (com_x - safe_min) * 100_000.0
+
+    else: 
+        penalty += 1_000_000.0
+
+    if placed:
+        max_y = max(y + radius(cid) for (cid, _, y) in placed)
+        penalty += max_y
+
+
+    return penalty
+
+
+    
 if __name__ == "__main__":
-    num_items = 10
-    pop_size = 10
+    random.seed(0)
+
+    num_items = len(CYLINDERS)
+    pop_size = 40
 
     pop = Population([
         Individual(random.sample(range(num_items), num_items ))
-        for i in range(pop_size)
+        for _ in range(pop_size)
     ])
 
-    best = evolve(pop, dummy_fitness, generations=30)
+    best = evolve(pop, cargo_fitness, generations=200, crossover_rate=0.9, mutation_rate=0.1)
+    
+    
+    
     print("Final Best", best.genome, best.fitness)
+    placements = decode_ordering(best.genome)
+    print("Placed:", len(placements), "out of", len(best.genome))
+    print("Placements (id, x, y):")
+    for cid, x, y in placements:
+        print(cid, x, y)
+
+  
+
+
 
