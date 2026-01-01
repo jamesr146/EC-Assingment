@@ -1,5 +1,6 @@
 import random
 import math 
+from Visualization import plot
 
 
 #Individual
@@ -213,6 +214,12 @@ if __name__ == "__main__":
     print("Placements (id, x, y):")
     for cid, x, y in placements:
         print(cid, x, y)
+
+
+
+
+    from Visualization import plot
+    plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS)
 
   
 
