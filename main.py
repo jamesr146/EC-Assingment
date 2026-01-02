@@ -1,12 +1,17 @@
 import random
 import math 
+
+
+
+
 from Visualization import plot
 
 
-#Individual
+
+#Each individual represents a permutation of cargo ID
 class Individual: 
     def __init__(self, genome):
-        self.genome = genome [:]
+        self.genome = genome[:]
         self.fitness = None
 
     def copy (self):
@@ -16,21 +21,26 @@ class Individual:
     
 
 
-#population 
+#Stores a lits of individuals and provides utility methods 
 class Population:
     def __init__(self, individuals):
+        
         self.individuals = individuals
 
     def get_best(self):
+        
         return min(self.individuals, key=lambda ind: ind.fitness)
         
-
+#Randomly selects 'K' individuals and selects the best 
 def tournamanet_selection(pop, k=3):
+    
     competitors = random.sample(pop.individuals, k)
     return min(competitors, key=lambda ind: ind.fitness).copy()
 
 
+#Mutation operator for permutation based genomes
 def swap_mutation (individual, mutation_rate=0.1):
+    
     new_genome = individual.genome[:]
     for i in range(len(new_genome)):
         if random.random() < mutation_rate:
@@ -40,8 +50,9 @@ def swap_mutation (individual, mutation_rate=0.1):
 
 
 
-#GA operators
+#Crossover operator for permutations
 def ordered_crossover(parent1, parent2):
+    
     size = len(parent1.genome)
     a, b = sorted(random.sample(range(size), 2))
 
@@ -60,9 +71,9 @@ def ordered_crossover(parent1, parent2):
 
 
 
-
-#GA evolve loop
+#GA evolution loop
 def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.1):
+    
     for ind in pop.individuals:
         ind.fitness = fitness_fn(ind)
 
@@ -98,10 +109,10 @@ def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.
     return pop.get_best()
 
 
-
+#Container requirements 
 CONTAINER_W = 20.0
 CONTAINER_H = 15.0
-CONTAINER_MAX_HEIGHT = 9999999.0
+CONTAINER_MAX_HEIGHT = 9999999.0 
 
 
 CYLINDERS = [
@@ -121,12 +132,9 @@ def weight(cid):
 
 
 
-
+#Row by row placement starting at rear of container
 def decode_ordering(ordering):
-    """
-    Simple row placement
-    """
-
+   
     placed = []
 
     x = 0.0
@@ -156,7 +164,10 @@ def decode_ordering(ordering):
     return placed
 
 
+
+#Fitness lower = better
 def cargo_fitness(ind):
+    
     ordering = ind.genome
     placed = decode_ordering(ordering)
 
@@ -204,21 +215,16 @@ if __name__ == "__main__":
         for _ in range(pop_size)
     ])
 
-    best = evolve(pop, cargo_fitness, generations=200, crossover_rate=0.9, mutation_rate=0.1)
-    
-    
+    best = evolve(pop, cargo_fitness, generations=200)
     
     print("Final Best", best.genome, best.fitness)
     placements = decode_ordering(best.genome)
-    print("Placed:", len(placements), "out of", len(best.genome))
+    
     print("Placements (id, x, y):")
     for cid, x, y in placements:
         print(cid, x, y)
-
-
-
-
-    from Visualization import plot
+       
+       
     plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS)
 
   
