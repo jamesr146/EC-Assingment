@@ -110,16 +110,16 @@ def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.
 
 
 #Container requirements 
-CONTAINER_W = 20.0
-CONTAINER_H = 15.0
-CONTAINER_MAX_HEIGHT = 9999999.0 
+CONTAINER_W = 12.0
+CONTAINER_H = 10.0
+CONTAINER_MAX_HEIGHT = 150.0
 
 
 CYLINDERS = [
-    {"diameter": 2.0, "weight": 100.0},
-    {"diameter": 2.4, "weight": 150.0},
-    {"diameter": 1.6, "weight": 80.0},
-    {"diameter": 3.0, "weight": 200.0}
+    {"diameter": 2.0, "weight": 20.0},
+    {"diameter": 3.0, "weight": 20.0},
+    {"diameter": 2.0, "weight": 15.0},
+    {"diameter": 2.0, "weight": 15.0}
 ]
 
 
