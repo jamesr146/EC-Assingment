@@ -227,6 +227,7 @@ if __name__ == "__main__":
        
     plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS)
 
+
   
 
 
