@@ -50,7 +50,7 @@ def plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS, com_x=None):
         circle = Circle(
             (x, y), 
             r, 
-            fill=False, 
+            fill=True, 
             facecolor="#99D9DD",
             edgecolor="white",
             alpha=0.6,
@@ -63,10 +63,13 @@ def plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS, com_x=None):
         ax.text(x, y, str(cid), ha='center', va='center', fontsize=10)
 
 
+    total_weight = sum(CYLINDERS[cid]["weight"] for cid, _, _ in placements)
 
-    if com_x is not None:
-        ax.axvline(com_x, color="red", linestyle='--', linewidth=1)
-        ax.text(com_x, CONTAINER_H * 0.95, "COM", color="red", ha = 'center')
+    if total_weight > 0:
+        com_x = sum(x * CYLINDERS[cid]["weight"] for cid, x, _ in placements) / total_weight
+        com_y = sum(y * CYLINDERS[cid]["weight"] for cid, _, y in placements) / total_weight
+
+        ax.plot(com_x, com_y, 'x', color='red', markersize=12, markeredgewidth=3, label="Centre of Mass")
 
 
     ax.set_aspect('equal')
@@ -83,6 +86,6 @@ def plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS, com_x=None):
 
     ax.legend(facecolor="#01364C", edgecolor="white", labelcolor="white")
 
-    plt.tight_layout
+    plt.tight_layout()
     plt.show
 
