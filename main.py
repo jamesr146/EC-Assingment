@@ -1,14 +1,77 @@
 import random
 import math 
 
-
-
-
+#Visualization Function
 from Visualization import plot
 
 
 
-#Each individual represents a permutation of cargo ID
+#---------------
+#BASIC INSTANCES
+#---------------
+
+def create_basic_instances():
+    """Basic Instances for GA"""
+    return [
+        {
+            "name": "Basic_01_three_identical",
+            "container": {"width": 10.0, "height":10.0, "max_weight": 100.0},
+            "cylinders": [
+                {"diameter": 2.0, "weight":10.0},
+                {"diameter": 2.0, "weight":10.0},
+                {"diameter": 2.0, "weight":10.0},
+            ],            
+        },
+
+        {
+            "name": "Basic_02_two_sizes",
+            "container": {"width": 12.0, "height":10.0, "max_weight": 150.0},
+            "cylinders": [
+                {"diameter": 3.0, "weight":20.0},
+                {"diameter": 3.0, "weight":20.0},
+                {"diameter": 2.0, "weight":15.0},
+                {"diameter": 2.0, "weight":15.0},
+            ],            
+        },
+
+        {
+            "name": "Basic_03_varied_sizes",
+            "container": {"width": 15.0, "height":12.0, "max_weight": 200.0},
+            "cylinders": [
+                {"diameter": 3.5, "weight":25.0},
+                {"diameter": 3.0, "weight":20.0},
+                {"diameter": 2.5, "weight":18.0},
+                {"diameter": 2.5, "weight":18.0},
+                {"diameter": 2.0, "weight":15.0},
+            ],            
+        },
+        
+    ]
+
+
+
+
+#Chose which Instrance to run
+BASIC_INSTANCE = create_basic_instances()
+INSTANCE_INDEX = 2   #change to 0 , 1 , 2
+INSTANCE = BASIC_INSTANCE[INSTANCE_INDEX]
+
+
+CONTAINER_W = INSTANCE["container"]["width"]
+CONTAINER_H = INSTANCE["container"]["height"]
+CONTAINER_MAX_HEIGHT = INSTANCE["container"]["width"]
+
+CYLINDERS = INSTANCE["cylinders"]
+
+
+
+
+
+
+#---------------
+#DATA STRUCTURES
+#---------------
+
 class Individual: 
     def __init__(self, genome):
         self.genome = genome[:]
@@ -21,7 +84,6 @@ class Individual:
     
 
 
-#Stores a lits of individuals and provides utility methods 
 class Population:
     def __init__(self, individuals):
         
@@ -31,14 +93,21 @@ class Population:
         
         return min(self.individuals, key=lambda ind: ind.fitness)
         
-#Randomly selects 'K' individuals and selects the best 
+
 def tournamanet_selection(pop, k=3):
     
     competitors = random.sample(pop.individuals, k)
     return min(competitors, key=lambda ind: ind.fitness).copy()
 
 
-#Mutation operator for permutation based genomes
+
+
+
+
+#------------------------------
+#SELECTION, CROSSOVER, MUTATION
+#------------------------------
+
 def swap_mutation (individual, mutation_rate=0.1):
     
     new_genome = individual.genome[:]
@@ -50,7 +119,7 @@ def swap_mutation (individual, mutation_rate=0.1):
 
 
 
-#Crossover operator for permutations
+
 def ordered_crossover(parent1, parent2):
     
     size = len(parent1.genome)
@@ -71,7 +140,13 @@ def ordered_crossover(parent1, parent2):
 
 
 
-#GA evolution loop
+
+
+
+#---------------
+#EVOLUTION LOOP
+#---------------
+
 def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.1):
     
     for ind in pop.individuals:
@@ -109,19 +184,16 @@ def evolve(pop, fitness_fn, generations=50, crossover_rate=0.9, mutation_rate=0.
     return pop.get_best()
 
 
-#Container requirements 
-CONTAINER_W = 12.0
-CONTAINER_H = 10.0
-CONTAINER_MAX_HEIGHT = 150.0
 
 
-CYLINDERS = [
-    {"diameter": 2.0, "weight": 20.0},
-    {"diameter": 3.0, "weight": 20.0},
-    {"diameter": 2.0, "weight": 15.0},
-    {"diameter": 2.0, "weight": 15.0}
-]
 
+
+
+
+
+#---------
+#PLACEMENT
+#---------
 
 def radius(cid):
     return CYLINDERS[cid]["diameter"] / 2.0
@@ -130,9 +202,6 @@ def weight(cid):
     return CYLINDERS[cid]["weight"]
 
 
-
-
-#Row by row placement starting at rear of container
 def decode_ordering(ordering):
    
     placed = []
@@ -164,8 +233,14 @@ def decode_ordering(ordering):
     return placed
 
 
+#-------
+#FITNESS
+#-------
 
-#Fitness lower = better
+
+
+
+
 def cargo_fitness(ind):
     
     ordering = ind.genome
@@ -204,6 +279,12 @@ def cargo_fitness(ind):
 
 
     
+
+
+#----------
+#MAIN
+#----------
+
 if __name__ == "__main__":
     random.seed(0)
 

@@ -28,22 +28,19 @@ def plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS, com_x=None):
     
     
 #SafeZone
-    safe_x = 0.2 * CONTAINER_W
-    safe_w = 0.6 * CONTAINER_W
-    safe_zone = Rectangle(
-        (safe_x, 0),
-        safe_w,
-        CONTAINER_H,
+    safe_radius = 0.6 * (CONTAINER_W / 2)
+    safe_circle = Circle(
+        (CONTAINER_W /  2, CONTAINER_H / 2),
+        safe_radius,
         fill=False,
         linestyle="--",
         linewidth=2,
-        edgecolor="#4CAF50",
+        edgecolor="#F4BA02",
     )
-    ax.add_patch(safe_zone)
+    ax.add_patch(safe_circle)
 
 
-
-
+#create the cylinders
     for cid, x, y in placements:
         r = CYLINDERS[cid]["diameter"] / 2.0
 
@@ -62,14 +59,14 @@ def plot(placements, CONTAINER_W, CONTAINER_H, CYLINDERS, com_x=None):
 
         ax.text(x, y, str(cid), ha='center', va='center', fontsize=10)
 
-
     total_weight = sum(CYLINDERS[cid]["weight"] for cid, _, _ in placements)
 
     if total_weight > 0:
         com_x = sum(x * CYLINDERS[cid]["weight"] for cid, x, _ in placements) / total_weight
         com_y = sum(y * CYLINDERS[cid]["weight"] for cid, _, y in placements) / total_weight
 
-        ax.plot(com_x, com_y, 'x', color='red', markersize=12, markeredgewidth=3, label="Centre of Mass")
+    if com_x is not None and com_y is not None:
+        ax.plot(com_x, com_y, marker='x', color='red', markersize=12, markeredgewidth=3, label="Centre of Mass")
 
 
     ax.set_aspect('equal')
