@@ -206,8 +206,12 @@ def decode_ordering(ordering):
    
     placed = []
 
+    first = ordering[0]
+    r = radius(first)
+
+
     x = 0.0
-    y = 0.0
+    y = 2 * r
     row_height = 0.0
 
     for cid in ordering:
